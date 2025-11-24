@@ -1,298 +1,164 @@
-# 🔗 Library API Gateway - Integração REST + SOAP
+# 🚀 Spring Boot REST + SOAP Gateway
 
-> **Sistema demonstrativo que integra APIs REST e SOAP através de um API Gateway, implementando HATEOAS, documentação automática e cliente web.**
+Sistema Gateway completo que integra APIs REST e SOAP em uma única aplicação Spring Boot, desenvolvido para demonstrar integração de sistemas e padrões arquiteturais modernos.
 
-## 📋 Objetivos Atendidos
+## 📋 Funcionalidades Implementadas
 
-✅ **Gateway** - Controller com rotas que integra REST e SOAP  
-✅ **HATEOAS** - Links dinâmicos no JSON de todas as respostas  
-✅ **Documentação** - Swagger automático acessível  
-✅ **2 APIs** - REST (Livros) + SOAP (Usuários) no mesmo projeto  
-✅ **Cliente Web** - Interface HTML para testar as APIs  
-✅ **SOAP + WSDL** - Endpoint funcionando com WSDL acessível  
-✅ **WSDL Demonstrado** - URL acessível e estrutura explicada  
-✅ **Cliente Diferente** - Python consumindo SOAP Java via WSDL  
+- ✅ **Gateway Unificado** - Controller centralizando acesso às APIs
+- ✅ **REST API com HATEOAS** - Navegação automática via links
+- ✅ **SOAP Web Service + WSDL** - Endpoint com contrato XML
+- ✅ **Documentação Swagger** - Interface automática para testes
+- ✅ **Cliente Web HTML** - Interface para demonstração
+- ✅ **Cliente Python SOAP** - Integração cross-platform
+- ✅ **Apresentação Completa** - Documentação e scripts inclusos
+
+## 🏗️ Arquitetura
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Cliente Web   │    │  Cliente Python │    │   Swagger UI    │
+│   (HTML/JS)     │    │   (SOAP)        │    │  (Documentação) │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │
+          └──────────────────────┼──────────────────────┘
+                                 │
+                    ┌─────────────▼───────────────┐
+                    │      Spring Boot App       │
+                    │     (localhost:8080)       │
+                    └─────────────┬───────────────┘
+                                  │
+                    ┌─────────────▼───────────────┐
+                    │       Gateway Layer        │
+                    │   (GatewayController)      │
+                    └─────────────┬───────────────┘
+                                  │
+          ┌───────────────────────┼───────────────────────┐
+          │                       │                       │
+┌─────────▼───────┐     ┌────────▼────────┐     ┌────────▼────────┐
+│   REST API      │     │   SOAP API      │     │  Static Files   │
+│ (LivroController)│     │(UsuarioController)│   │  (index.html)   │
+│   + HATEOAS     │     │   + WSDL        │     │                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
 
 ## 🚀 Como Executar
 
-### 1. Clonar e Compilar
+### Pré-requisitos
+- Java 17+
+- Maven 3.6+
+- Python 3.x (para cliente SOAP)
+
+### Execução
 ```bash
-git clone <url-do-repositorio>
-cd proj
-./mvnw clean compile
-```
+# 1. Clonar o repositório
+git clone https://github.com/Alencast/spring-boot-rest-soap-gateway.git
+cd spring-boot-rest-soap-gateway
 
-### 2. Executar a Aplicação
-```bash
-./mvnw spring-boot:run
-```
+# 2. Executar aplicação
+mvn spring-boot:run
 
-### 3. Acessar as Interfaces
-- **Cliente Web**: http://localhost:8080/
-- **Swagger**: http://localhost:8080/swagger-ui.html
-- **WSDL**: http://localhost:8080/ws/usuarios.wsdl
-- **Gateway Info**: http://localhost:8080/gateway
+# 3. Acessar interfaces
+http://localhost:8080                    # Cliente web
+http://localhost:8080/swagger-ui.html    # Documentação Swagger
+http://localhost:8080/ws/usuarios.wsdl   # WSDL SOAP
 
-## 🏗️ Arquitetura do Sistema
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    API Gateway                              │
-│                 /gateway/*                                  │
-├─────────────────────────────────────────────────────────────┤
-│              │                        │                     │
-│    REST API  │                   SOAP API                   │
-│   (Livros)   │                 (Usuários)                   │
-│  /api/livros │                    /ws/*                     │
-│              │                        │                     │
-└─────────────────────────────────────────────────────────────┘
-              │                        │
-        ┌─────────────┐        ┌─────────────┐
-        │ HATEOAS     │        │ WSDL        │
-        │ Links       │        │ Generated   │
-        │ Automáticos │        │ Schema      │
-        └─────────────┘        └─────────────┘
-```
-
-## 🔍 APIs Disponíveis
-
-### 🚪 Gateway Endpoints
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `GET` | `/gateway` | Info do gateway com links HATEOAS |
-| `GET` | `/gateway/livros` | Livros via gateway (REST) |
-| `GET` | `/gateway/livros/{id}` | Livro específico via gateway |
-| `POST` | `/gateway/livros` | Criar livro via gateway |
-| `GET` | `/gateway/usuarios` | Usuários via gateway (SOAP) |
-| `GET` | `/gateway/usuarios/{id}` | Usuário específico via gateway |
-
-### 📚 REST API - Livros
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `GET` | `/api/livros` | Lista todos os livros |
-| `GET` | `/api/livros/{id}` | Busca livro por ID |
-| `POST` | `/api/livros` | Cria novo livro |
-
-### 🌐 SOAP API - Usuários
-| Operação | Descrição |
-|----------|-----------|
-| `getAllUsuarios` | Lista todos os usuários |
-| `getUsuario` | Busca usuário por ID |
-| `createUsuario` | Cria novo usuário |
-
-## 🔗 HATEOAS - Exemplo de Resposta
-
-```json
-{
-  "_embedded": {
-    "livroList": [
-      {
-        "id": 1,
-        "titulo": "Spring Boot in Action",
-        "autor": "Craig Walls",
-        "isbn": "978-1617292545",
-        "_links": {
-          "self": {"href": "http://localhost:8080/api/livros/1"},
-          "livros": {"href": "http://localhost:8080/api/livros"}
-        }
-      }
-    ]
-  },
-  "_links": {
-    "self": {"href": "http://localhost:8080/api/livros"}
-  }
-}
-```
-
-## 📄 WSDL - Principais Tags Demonstradas
-
-Acesse http://localhost:8080/ws/usuarios.wsdl para ver o WSDL completo.
-
-### Estrutura Principal:
-```xml
-<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" 
-             targetNamespace="http://proj.example.com/usuario">
-  
-  <!-- Definição dos tipos de dados -->
-  <types>
-    <xsd:schema targetNamespace="http://proj.example.com/usuario">
-      <xsd:element name="getUsuarioRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="id" type="xsd:long"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <!-- ... outros elementos ... -->
-    </xsd:schema>
-  </types>
-  
-  <!-- Definição das mensagens -->
-  <message name="getUsuarioRequest">
-    <part element="tns:getUsuarioRequest" name="getUsuarioRequest"/>
-  </message>
-  
-  <!-- Interface do serviço -->
-  <portType name="UsuariosPort">
-    <operation name="getUsuario">
-      <input message="tns:getUsuarioRequest" name="getUsuarioRequest"/>
-      <output message="tns:getUsuarioResponse" name="getUsuarioResponse"/>
-    </operation>
-  </portType>
-  
-  <!-- Protocolo de comunicação -->
-  <binding name="UsuariosPortSoap11" type="tns:UsuariosPort">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <!-- ... operações ... -->
-  </binding>
-  
-  <!-- Endpoint do serviço -->
-  <service name="UsuariosPortService">
-    <port binding="tns:UsuariosPortSoap11" name="UsuariosPortSoap11">
-      <soap:address location="http://localhost:8080/ws"/>
-    </port>
-  </service>
-  
-</definitions>
-```
-
-### Tags Importantes:
-- **`<definitions>`**: Elemento raiz que define o Web Service
-- **`<types>`**: Especifica tipos de dados usando XML Schema
-- **`<message>`**: Define estrutura das mensagens SOAP
-- **`<portType>`**: Interface abstrata do serviço
-- **`<binding>`**: Define protocolo de comunicação (SOAP/HTTP)
-- **`<service>`**: Especifica endpoints concretos
-
-## 🐍 Cliente Python - Como Funciona
-
-Execute o cliente Python para demonstrar integração cross-platform:
-
-```bash
-# Instalar dependências
+# 4. Executar cliente Python (opcional)
 pip install requests
-
-# Executar cliente (com servidor rodando)
 python client_soap_python.py
 ```
 
-### Como o Python usa o WSDL:
+## 📖 Endpoints Disponíveis
 
-1. **Descoberta**: Faz GET para `/ws/usuarios.wsdl`
-2. **Análise**: Parseia XML para entender estrutura
-3. **Construção**: Monta envelopes SOAP baseados no schema
-4. **Comunicação**: Envia POST com `Content-Type: text/xml`
-5. **Processamento**: Analisa resposta XML usando ElementTree
+### REST API - Livros
+- `GET /api/livros` - Listar livros
+- `GET /api/livros/{id}` - Buscar livro por ID
+- `POST /api/livros` - Criar novo livro
 
-### Exemplo de Envelope SOAP gerado:
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-               xmlns:usr="http://proj.example.com/usuario">
-    <soap:Header/>
-    <soap:Body>
-        <usr:getUsuarioRequest>
-            <usr:id>1</usr:id>
-        </usr:getUsuarioRequest>
-    </soap:Body>
-</soap:Envelope>
-```
+### SOAP API - Usuários
+- `POST /ws` - Operações SOAP (getAllUsuarios, getUsuario, createUsuario)
 
-## 🧪 Testes Manuais
+### Gateway Unificado
+- `GET /gateway/livros` - Livros via Gateway
+- `GET /gateway/usuarios` - Usuários via Gateway
 
-### 1. Testar Gateway
-```bash
-curl http://localhost:8080/gateway
-```
+## 🛠️ Tecnologias Utilizadas
 
-### 2. Testar REST com HATEOAS
-```bash
-curl -H "Accept: application/json" http://localhost:8080/api/livros
-```
-
-### 3. Testar SOAP via Gateway
-```bash
-curl http://localhost:8080/gateway/usuarios
-```
-
-### 4. Criar Livro via Gateway
-```bash
-curl -X POST http://localhost:8080/gateway/livros \
-  -H "Content-Type: application/json" \
-  -d '{"titulo":"Test Book","autor":"Test Author","isbn":"123456789"}'
-```
-
-### 5. Testar SOAP Direto
-```bash
-curl -X POST http://localhost:8080/ws \
-  -H "Content-Type: text/xml; charset=utf-8" \
-  -d '<?xml version="1.0" encoding="UTF-8"?>
-      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-                     xmlns:usr="http://proj.example.com/usuario">
-          <soap:Body>
-              <usr:getAllUsuariosRequest/>
-          </soap:Body>
-      </soap:Envelope>'
-```
-
-## 📊 Tecnologias Utilizadas
-
-- **Spring Boot 3.x** - Framework principal
-- **Spring Web** - API REST
-- **Spring Web Services** - SOAP
-- **Spring HATEOAS** - Links dinâmicos
-- **SpringDoc OpenAPI** - Documentação automática Swagger
-- **Lombok** - Redução de boilerplate
-- **JAXB** - Binding XML/Java
+- **Spring Boot 3.2.0** - Framework principal
+- **Spring Web Services** - SOAP/WSDL
+- **SpringDoc OpenAPI** - Swagger automático
+- **Jakarta XML Bind (JAXB)** - XML/Object binding
+- **Maven** - Gerenciamento de dependências
 - **HTML5/CSS3/JavaScript** - Cliente web
-- **Python + requests** - Cliente SOAP
+- **Python + Requests** - Cliente cross-platform
 
-## 🎯 Demonstração Presencial
-
-### Checklist para apresentação:
-
-1. **✅ Iniciar aplicação** - `./mvnw spring-boot:run`
-2. **✅ Mostrar cliente web** - http://localhost:8080/
-3. **✅ Demonstrar HATEOAS** - Clicar em "Listar Livros"
-4. **✅ Mostrar Swagger** - http://localhost:8080/swagger-ui.html
-5. **✅ Apresentar WSDL** - http://localhost:8080/ws/usuarios.wsdl
-6. **✅ Executar cliente Python** - `python client_soap_python.py`
-7. **✅ Testar integração Gateway** - Usuários via SOAP através do Gateway
-8. **✅ Criar recursos** - Criar livro e usuário
-9. **✅ Mostrar logs** - Demonstrar comunicação SOAP
-
-### Pontos principais para destacar:
-- **Gateway unifica** REST e SOAP
-- **HATEOAS** em todas as respostas REST
-- **WSDL gerado automaticamente** pelo Spring
-- **Cliente Python** usando WSDL para integração
-- **Swagger documentação** automática e interativa
-
-## 🔧 Estrutura de Diretórios
+## 📁 Estrutura do Projeto
 
 ```
-proj/
-├── src/main/java/com/example/proj/
-│   ├── LibraryApplication.java          # Aplicação principal + Swagger
-│   ├── config/
-│   │   └── WebServiceConfig.java        # Configuração SOAP
-│   ├── controller/
-│   │   ├── GatewayController.java       # 🚪 Gateway principal
-│   │   ├── LivroController.java         # 📚 API REST
-│   │   └── UsuarioSoapController.java   # 🌐 API SOAP
-│   └── model/
-│       ├── Livro.java                   # Modelo Livro
-│       └── Usuario.java                 # Modelo Usuario
-├── src/main/resources/
-│   ├── application.properties           # Configurações
-│   ├── usuarios.xsd                     # Schema XSD para SOAP
-│   └── static/
-│       └── index.html                   # 🌐 Cliente web
-├── client_soap_python.py               # 🐍 Cliente Python
-├── pom.xml                              # Dependências Maven
-└── README.md                            # Esta documentação
+src/
+├── main/
+│   ├── java/com/example/proj/
+│   │   ├── LibraryApplication.java          # Aplicação principal
+│   │   ├── config/
+│   │   │   └── WebServiceConfig.java        # Configuração SOAP
+│   │   ├── controller/
+│   │   │   ├── GatewayController.java       # Gateway unificado
+│   │   │   ├── LivroController.java         # REST API
+│   │   │   └── UsuarioSoapController.java   # SOAP API
+│   │   └── model/
+│   │       ├── Livro.java                   # Modelo Livro
+│   │       └── Usuario.java                 # Modelo Usuário
+│   └── resources/
+│       ├── static/
+│       │   ├── index.html                   # Cliente web
+│       │   └── APRESENTACAO.md              # Documentação completa
+│       ├── usuarios.xsd                     # Schema XML SOAP
+│       └── application.properties           # Configurações
+├── client_soap_python.py                    # Cliente Python
+└── APRESENTACAO.md                           # Apresentação do projeto
 ```
+
+## 🎯 Conceitos Demonstrados
+
+### Padrões Arquiteturais
+- **Gateway Pattern** - Centralizando acesso às APIs
+- **Facade Pattern** - Interface unificada
+- **MVC Pattern** - Separação de responsabilidades
+
+### Tecnologias Web
+- **REST** - Arquitetura stateless
+- **SOAP** - Protocol baseado em XML
+- **HATEOAS** - Hipermídia para navegação
+- **OpenAPI** - Documentação automática
+
+### Integração de Sistemas
+- **Cross-Platform** - Java ↔ Python
+- **Multi-Protocol** - REST + SOAP
+- **Auto-Documentation** - WSDL + Swagger
+
+## 📊 Resultados
+
+- ✅ **7/7 Requisitos** implementados
+- ✅ **3 Protocolos** funcionando (REST, SOAP, HTTP)
+- ✅ **4 Tecnologias** integradas (Java, HTML, JS, Python)
+- ✅ **2 Paradigmas** demonstrados (OOP + Web Services)
+- ✅ **1 Gateway** centralizando tudo
+
+## 📝 Documentação
+
+A documentação completa do projeto, incluindo scripts de apresentação e explicações detalhadas, está disponível em:
+- [`APRESENTACAO.md`](./APRESENTACAO.md) - Documentação completa
+- [Swagger UI](http://localhost:8080/swagger-ui.html) - Documentação interativa das APIs
+- [WSDL](http://localhost:8080/ws/usuarios.wsdl) - Contrato do Web Service
+
+## 🎓 Uso Acadêmico
+
+Este projeto foi desenvolvido para demonstrar:
+- Integração de sistemas heterogêneos
+- Padrões arquiteturais modernos
+- Implementação de Web Services
+- Documentação automática de APIs
+- Comunicação cross-platform
 
 ---
 
-**🎓 Projeto desenvolvido para demonstrar integração de tecnologias REST e SOAP através de API Gateway com documentação automática e cliente cross-platform.**
+*Desenvolvido como projeto acadêmico para demonstrar integração REST + SOAP com Spring Boot* 🚀
