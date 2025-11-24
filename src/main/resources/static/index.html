@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library API Gateway - Cliente Web</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            color: #333;
+        }
+        .api-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .soap-section {
+            border-left-color: #28a745;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .soap-btn {
+            background-color: #28a745;
+        }
+        .soap-btn:hover {
+            background-color: #1e7e34;
+        }
+        #results {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        .links {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e7f3ff;
+            border-radius: 4px;
+        }
+        .links a {
+            display: inline-block;
+            margin: 5px 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .doc-link {
+            background-color: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .doc-link a {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-decoration: none;
+        }
+        .doc-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 Library API Gateway</h1>
+            <p>Cliente Web para demonstração da integração REST + SOAP</p>
+        </div>
+
+        <div class="doc-link">
+            <a href="/APRESENTACAO.md" target="_blank">
+                📋 Ver Apresentação Completa do Projeto
+            </a>
+        </div>
+
+        <div class="api-section">
+            <h2>📚 API REST - Livros</h2>
+            <p>Gerenciamento de livros através de endpoints REST com HATEOAS</p>
+            
+            <button onclick="getAllLivros()">Listar Livros (GET)</button>
+            <button onclick="getLivroById()">Buscar Livro por ID</button>
+            
+            <div class="input-group">
+                <label>ID do Livro:</label>
+                <input type="number" id="livroId" placeholder="Ex: 1" value="1">
+            </div>
+            
+            <h3>Criar Novo Livro</h3>
+            <div class="input-group">
+                <label>Título:</label>
+                <input type="text" id="livroTitulo" placeholder="Ex: Spring Boot Guide">
+                <label>Autor:</label>
+                <input type="text" id="livroAutor" placeholder="Ex: João Silva">
+                <label>ISBN:</label>
+                <input type="text" id="livroIsbn" placeholder="Ex: 978-1234567890">
+            </div>
+            <button onclick="createLivro()">Criar Livro (POST)</button>
+        </div>
+
+        <div class="api-section soap-section">
+            <h2>🌐 API SOAP - Usuários</h2>
+            <p>Gerenciamento de usuários através de Web Services SOAP</p>
+            
+            <button class="soap-btn" onclick="getAllUsuarios()">Listar Usuários (SOAP)</button>
+            <button class="soap-btn" onclick="getUsuarioById()">Buscar Usuário por ID</button>
+            
+            <div class="input-group">
+                <label>ID do Usuário:</label>
+                <input type="number" id="usuarioId" placeholder="Ex: 1" value="1">
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>🚪 Gateway</h2>
+            <p>Endpoints do Gateway que integram as APIs</p>
+            
+            <button onclick="getGatewayInfo()">Info do Gateway</button>
+            <button onclick="getLivrosViaGateway()">Livros via Gateway</button>
+            <button onclick="getUsuariosViaGateway()">Usuários via Gateway</button>
+        </div>
+
+        <div class="links">
+            <h3>🔗 Links Importantes</h3>
+            <a href="/swagger-ui.html" target="_blank">📋 Documentação Swagger</a>
+            <a href="/ws/usuarios.wsdl" target="_blank">📄 WSDL dos Usuários</a>
+            <a href="/gateway" target="_blank">🚪 Gateway Info JSON</a>
+            <a href="/api/livros" target="_blank">📚 API REST Livros</a>
+        </div>
+
+        <div class="container">
+            <h3>📋 Resultados</h3>
+            <div id="results">Clique em qualquer botão acima para ver os resultados...</div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = window.location.origin;
+        const resultsDiv = document.getElementById('results');
+
+        function displayResult(data, title = '') {
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.textContent = `[${timestamp}] ${title}\n\n${JSON.stringify(data, null, 2)}`;
+        }
+
+        function displayError(error, title = 'Erro') {
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.textContent = `[${timestamp}] ${title}\n\n${error}`;
+        }
+
+        // REST API - Livros
+        async function getAllLivros() {
+            try {
+                const response = await fetch(`${apiBase}/api/livros`);
+                const data = await response.json();
+                displayResult(data, 'GET /api/livros - Lista de Livros (REST)');
+            } catch (error) {
+                displayError(error.message, 'Erro ao buscar livros');
+            }
+        }
+
+        async function getLivroById() {
+            const id = document.getElementById('livroId').value;
+            if (!id) {
+                displayError('Por favor, informe o ID do livro');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${apiBase}/api/livros/${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult(data, `GET /api/livros/${id} - Livro por ID (REST)`);
+                } else {
+                    displayError(`Livro não encontrado (Status: ${response.status})`);
+                }
+            } catch (error) {
+                displayError(error.message, 'Erro ao buscar livro');
+            }
+        }
+
+        async function createLivro() {
+            const titulo = document.getElementById('livroTitulo').value;
+            const autor = document.getElementById('livroAutor').value;
+            const isbn = document.getElementById('livroIsbn').value;
+            
+            if (!titulo || !autor || !isbn) {
+                displayError('Por favor, preencha todos os campos do livro');
+                return;
+            }
+            
+            const livro = { titulo, autor, isbn };
+            
+            try {
+                const response = await fetch(`${apiBase}/api/livros`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(livro)
+                });
+                
+                const data = await response.json();
+                displayResult(data, 'POST /api/livros - Livro Criado (REST)');
+                
+                // Limpar campos
+                document.getElementById('livroTitulo').value = '';
+                document.getElementById('livroAutor').value = '';
+                document.getElementById('livroIsbn').value = '';
+            } catch (error) {
+                displayError(error.message, 'Erro ao criar livro');
+            }
+        }
+
+        // Gateway
+        async function getGatewayInfo() {
+            try {
+                const response = await fetch(`${apiBase}/gateway`);
+                const data = await response.json();
+                displayResult(data, 'GET /gateway - Informações do Gateway');
+            } catch (error) {
+                displayError(error.message, 'Erro ao buscar info do gateway');
+            }
+        }
+
+        async function getLivrosViaGateway() {
+            try {
+                const response = await fetch(`${apiBase}/gateway/livros`);
+                const data = await response.json();
+                displayResult(data, 'GET /gateway/livros - Livros via Gateway');
+            } catch (error) {
+                displayError(error.message, 'Erro ao buscar livros via gateway');
+            }
+        }
+
+        async function getUsuariosViaGateway() {
+            try {
+                const response = await fetch(`${apiBase}/gateway/usuarios`);
+                const data = await response.json();
+                displayResult(data, 'GET /gateway/usuarios - Usuários via Gateway (SOAP)');
+            } catch (error) {
+                displayError(error.message, 'Erro ao buscar usuários via gateway');
+            }
+        }
+
+        async function getAllUsuarios() {
+            try {
+                const response = await fetch(`${apiBase}/gateway/usuarios`);
+                const data = await response.json();
+                displayResult(data, 'Usuários via SOAP através do Gateway');
+            } catch (error) {
+                displayError(error.message, 'Erro ao buscar usuários SOAP');
+            }
+        }
+
+        async function getUsuarioById() {
+            const id = document.getElementById('usuarioId').value;
+            if (!id) {
+                displayError('Por favor, informe o ID do usuário');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${apiBase}/gateway/usuarios/${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult(data, `Usuário ID ${id} via SOAP através do Gateway`);
+                } else {
+                    displayError(`Usuário não encontrado (Status: ${response.status})`);
+                }
+            } catch (error) {
+                displayError(error.message, 'Erro ao buscar usuário');
+            }
+        }
+
+        // Carregar info inicial do gateway
+        window.onload = function() {
+            getGatewayInfo();
+        };
+    </script>
+</body>
+</html>
