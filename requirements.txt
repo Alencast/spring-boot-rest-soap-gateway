@@ -1,0 +1,28 @@
+# Spring Boot REST+SOAP Gateway - Requirements
+
+## Java
+Java 17+
+Verificar: java -version
+Download: https://adoptium.net/
+
+## Maven
+Maven 3.6+ (ou usar wrapper incluído)
+Verificar: mvn -version
+Download: https://maven.apache.org/
+
+## Python (para cliente SOAP)
+Python 3.8+
+Verificar: python --version
+Download: https://python.org/
+
+## Dependências Python
+requests==2.31.0
+Instalar: pip install requests
+
+## Comandos para rodar:
+1. mvn spring-boot:run
+2. Abrir: http://localhost:8080
+3. python client_soap_python.py
+
+## Portas necessárias:
+8080 - Spring Boot
