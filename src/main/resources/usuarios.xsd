@@ -4,7 +4,7 @@
            xmlns:tns="http://proj.example.com/usuario"
            elementFormDefault="qualified">
 
-<!-- Contrato dos dados ( oque vai ter no xml) -->
+<!-- Contrato dos dados ( oque vai ter no xml) define a estrutura dos dados que o wsdl usa-->
     <xs:element name="getUsuarioRequest">
         <xs:complexType>
             <xs:sequence>
