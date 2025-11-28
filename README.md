@@ -161,4 +161,23 @@ Este projeto foi desenvolvido para demonstrar:
 
 ---
 
-*Desenvolvido como projeto acadêmico para demonstrar integração REST + SOAP com Spring Boot* 🚀
+# Spring Boot REST/SOAP Gateway
+
+## Pré-requisitos
+- Java 17+
+- Maven 3.6+
+
+## Como executar
+1. Clone o projeto
+2. Execute: `mvn clean install`
+3. Execute: `mvn spring-boot:run`
+4. Acesse: http://localhost:8080
+
+## APIs disponíveis
+- REST API: http://localhost:8080/api/livros
+- SOAP API: http://localhost:8080/ws
+- Gateway: http://localhost:8080/gateway
+- Swagger: http://localhost:8080/swagger-ui.html
+- WSDL: http://localhost:8080/ws/usuarios.wsdl
+
+*Desenvolvido como projeto acadêmico para demonstrar integração REST + SOAP com Spring Boot* 

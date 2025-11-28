@@ -157,4 +157,36 @@ public class GatewayController {
             return ResponseEntity.notFound().build();
         }
     }
+    
+    @PostMapping("/usuarios")
+    @Operation(summary = "Criar usuário via Gateway", description = "Cria novo usuário via SOAP através do Gateway")
+    public ResponseEntity<Map<String, Object>> createUsuarioViaGateway(@RequestBody Map<String, String> usuarioData) {
+        String nome = usuarioData.get("nome");
+        String email = usuarioData.get("email");
+        
+        if (nome == null || nome.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Nome e email são obrigatórios");
+            error.put("source", "SOAP API");
+            return ResponseEntity.badRequest().body(error);
+        }
+        
+        var request = new UsuarioSoapController.CreateUsuarioRequest();
+        request.setNome(nome);
+        request.setEmail(email);
+        var response = usuarioSoapController.createUsuario(request);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("source", "SOAP API");
+        result.put("usuario", response.getUsuario());
+        result.put("message", "Usuário criado com sucesso");
+        result.put("_links", Map.of(
+            "gateway", "/gateway",
+            "self", "/gateway/usuarios/" + response.getUsuario().getId(),
+            "all", "/gateway/usuarios",
+            "wsdl", "/ws/usuarios.wsdl"
+        ));
+        
+        return ResponseEntity.ok(result);
+    }
 }

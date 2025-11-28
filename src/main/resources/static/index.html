@@ -156,6 +156,15 @@
                 <label>ID do Usuário:</label>
                 <input type="number" id="usuarioId" placeholder="Ex: 1" value="1">
             </div>
+            
+            <h3>Criar Novo Usuário</h3>
+            <div class="input-group">
+                <label>Nome:</label>
+                <input type="text" id="usuarioNome" placeholder="Ex: Ana Silva">
+                <label>Email:</label>
+                <input type="email" id="usuarioEmail" placeholder="Ex: ana@email.com">
+            </div>
+            <button class="soap-btn" onclick="createUsuario()">Criar Usuário (SOAP)</button>
         </div>
 
         <div class="api-section">
@@ -317,6 +326,42 @@
                 }
             } catch (error) {
                 displayError(error.message, 'Erro ao buscar usuário');
+            }
+        }
+
+        async function createUsuario() {
+            const nome = document.getElementById('usuarioNome').value;
+            const email = document.getElementById('usuarioEmail').value;
+            
+            if (!nome || !email) {
+                displayError('Por favor, preencha todos os campos do usuário');
+                return;
+            }
+            
+            const usuario = { nome, email };
+            
+            try {
+                const response = await fetch(`${apiBase}/gateway/usuarios`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(usuario)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult(data, 'POST /gateway/usuarios - Usuário Criado (SOAP via Gateway)');
+                    
+                    // Limpar campos
+                    document.getElementById('usuarioNome').value = '';
+                    document.getElementById('usuarioEmail').value = '';
+                } else {
+                    const errorData = await response.json();
+                    displayError(errorData.error || 'Erro ao criar usuário', 'Erro na criação');
+                }
+            } catch (error) {
+                displayError(error.message, 'Erro ao criar usuário');
             }
         }
 
